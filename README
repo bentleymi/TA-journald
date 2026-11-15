@@ -1,0 +1,53 @@
+TA-journald
+====
+
+Collects journald log-plane metadata: journal disk usage (journalctl --disk-usage), journal file count under /var/log/journal, total journal size, age of the oldest journal file, and the journald service state. Emits JSON events to index=main (sourcetype journald:status) and journald.* metrics (disk_kb, size_mb, file_count) to index=metrics (sourcetype journald:metrics) every 300s, with dashboards.
+
+Prerequisites
+-------------
+  * systemd-journald (standard on systemd hosts)
+  * Splunk Enterprise or Universal Forwarder 9.x - 10.6 (forwarder recommended
+    on monitored hosts).
+  * A metrics-typed index (default name: metrics) on the indexer:
+
+      [metrics]
+      datatype = metric
+
+    Forwarders only need that index to exist on the indexer side.
+  * No network egress, no root requirement beyond the Splunk service account.
+    Fully standalone add-on with no dependencies.
+
+Install
+-------
+Install on each monitored host (Apps > Install app from file, splunk install
+app, or deployment server), restart Splunk, then verify:
+
+  index=main sourcetype="journald:status" | head
+
+Search quick reference
+----------------------
+  index=main sourcetype="journald:status" | head
+  | mcatalog values(metric_name) where index=metrics metric_name="journald.*" by host
+  | mstats avg("journald.*") where index=metrics span=60s by host
+
+Usage
+-----
+Events: index=main sourcetype=journald:status  (disk_kb, size_mb, file_count, oldest_age_hours, service state)
+Metrics: journald.disk_kb, journald.size_mb, journald.file_count on index=metrics
+Alarm status when journal disk usage exceeds 8 GB.
+Dashboards: TA-Journald > Journald Overview / Journald Metrics
+
+Configure
+---------
+Override the interval or destination index in etc/apps/TA-journald/local/inputs.conf
+(never edit default/).
+
+Troubleshooting
+---------------
+  * disk-usage parsing tolerates the '4.2G' style; falls back to a filesystem walk of /var/log/journal.
+
+License
+-------
+SOURCE-AVAILABLE (see LICENSE) - free personal, educational and evaluation
+use; commercial or production use requires a paid license from BentleyPC
+LLC (https://www.bentleypc.com).

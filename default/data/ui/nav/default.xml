@@ -1,0 +1,7 @@
+<application>
+  <nav>
+    <view name="journald_overview" />
+    <view name="journald_metrics" />
+    <search label="TA-journald Events" search="search index=main sourcetype=journald:status" />
+  </nav>
+</application>
