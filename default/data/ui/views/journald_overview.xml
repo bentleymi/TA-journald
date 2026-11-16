@@ -3,43 +3,57 @@
   <description>Collects journald log-plane metadata: journal disk usage (journalctl --disk-usage), journal file count under /var/log/journal, total journal size, age of the oldest journal file,</description>
   <row>
     <panel>
-      <title>Hosts Reporting (latest)</title>
-      <table>
-        <search>
-          <query>index=main sourcetype="journald:status"
-| stats latest(_time) as "Last seen", count as Reports by host
-| table host "Last seen" Reports</query>
-          <done/>
-        </search>
-        <option name="drilldown">none</option>
-      </table>
-    </panel>
-  </row>
-  <row>
-    <panel>
-      <title>Distinct journald.* Metrics (last hour)</title>
+      <title>Journal size (MB - per host, latest)</title>
       <single>
         <search>
-          <query>| mcatalog values(metric_name) as m where index=metrics metric_name="journald.*"
-| eval count=mvcount(m)</query>
+          <query>| mstats avg("journald.size_mb") as value where index=metrics span=5m
+| fields - _time | tail 1</query>
           <done/>
         </search>
-        <option name="underLabel">journald.* metrics streaming</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Journal files (per host, latest)</title>
+      <single>
+        <search>
+          <query>| mstats avg("journald.file_count") as value where index=metrics span=5m
+| fields - _time | tail 1</query>
+          <done/>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <title>Oldest journal age (hours, per host)</title>
+      <single>
+        <search>
+          <query>| mstats avg("journald.oldest_age_hours") as value where index=metrics span=5m
+| fields - _time | tail 1</query>
+          <done/>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <title>systemd-journald active (1=yes, per host)</title>
+      <single>
+        <search>
+          <query>| mstats avg("journald.service_active") as value where index=metrics span=5m
+| fields - _time | tail 1</query>
+          <done/>
+        </search>
       </single>
     </panel>
   </row>
   <row>
     <panel>
-      <title>Issues (newest first)</title>
+      <title>Journal store (latest per host)</title>
       <table>
         <search>
-          <query>index=main sourcetype="journald:status" _raw="*alarm*"
-| sort - _time
-| table _time host _raw
-| rename _raw as Event
-| head 200</query>
+          <query>index=main sourcetype="journald:status"
+| dedup host
+| table host size_mb disk_kb file_count oldest_age_hours service_active</query>
           <done/>
         </search>
+        <option name="count">50</option>
         <option name="drilldown">none</option>
       </table>
     </panel>

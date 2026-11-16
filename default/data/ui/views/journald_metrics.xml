@@ -1,35 +1,62 @@
 <dashboard version="1.1" theme="light">
   <label>TA-journald Metrics</label>
-  <description>Index-time metrics over index=metrics (sourcetype=journald:metrics)</description>
+  <description> Index-time metrics over index=metrics (sourcetype journald:metrics); series prefixed 'journald.'.</description>
   <row>
     <panel>
-      <title>All journald.* series</title>
+      <title>Journal size (MB)</title>
       <chart>
         <search>
-          <query>| mstats avg("journald.*") as "v*" where index=metrics by metric_name span=5m
-| foreach v* [eval Value=coalesce(Value,&lt;&lt;FIELD&gt;&gt;)]
-| fields - v*
-| xyseries _time metric_name Value</query>
+          <query>| mstats avg("journald.size_mb") as value where index=metrics by metric_name span=5m
+| rename value as "journald.size_mb"</query>
           <done/>
         </search>
         <option name="charting.chart">line</option>
-        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.nullValueRendering">connect</option>
         <option name="charting.drilldown">none</option>
       </chart>
     </panel>
-      <panel>
-      <title>Journal size (MB / KB)</title>
+  </row>
+  <row>
+    <panel>
+      <title>Journal files</title>
       <chart>
         <search>
-          <query>| mstats avg("journald.*") as "v*" where index=metrics by metric_name span=5m
-| search metric_name IN ("*disk_kb*","*size_mb*","*file_count*")
-| foreach v* [eval Value=coalesce(Value,&lt;&lt;FIELD&gt;&gt;)]
-| fields - v*
-| xyseries _time metric_name Value</query>
+          <query>| mstats avg("journald.file_count") as value where index=metrics by metric_name span=5m
+| rename value as "journald.file_count"</query>
           <done/>
         </search>
         <option name="charting.chart">line</option>
-        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.nullValueRendering">connect</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Oldest journal age (hours)</title>
+      <chart>
+        <search>
+          <query>| mstats avg("journald.oldest_age_hours") as value where index=metrics by metric_name span=5m
+| rename value as "journald.oldest_age_hours"</query>
+          <done/>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueRendering">connect</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Service active (0/1)</title>
+      <chart>
+        <search>
+          <query>| mstats avg("journald.service_active") as value where index=metrics by metric_name span=5m
+| rename value as "journald.service_active"</query>
+          <done/>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueRendering">connect</option>
         <option name="charting.drilldown">none</option>
       </chart>
     </panel>
