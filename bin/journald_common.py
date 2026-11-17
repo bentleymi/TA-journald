@@ -1,4 +1,4 @@
-"""Shared collection logic for TA-journald scripted inputs (journal disk usage + growth)."""
+"""Shared collection logic for TA-journald-logplane scripted inputs (journal disk usage + growth)."""
 import json
 import os
 import re
@@ -131,5 +131,5 @@ def emit(payload):
 
 
 def fail(message):
-    sys.stderr.write("TA-journald collection error: %s\n" % message)
+    sys.stderr.write("TA-journald-logplane collection error: %s\n" % message)
     return 1
