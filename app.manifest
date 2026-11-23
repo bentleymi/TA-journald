@@ -4,7 +4,7 @@
     "title": "Journald Log-Plane Meta Add-on (disk usage, file growth)",
     "id": {
       "group": null,
-      "name": "TA-journald-logplane",
+      "name": "TA-journald",
       "version": "1.0.8"
     },
     "author": [

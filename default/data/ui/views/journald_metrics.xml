@@ -1,5 +1,5 @@
 <dashboard version="1.1" theme="light">
-  <label>TA-journald-logplane Metrics</label>
+  <label>TA-journald Metrics</label>
   <description> Index-time metrics over index=metrics (sourcetype journald:metrics); series prefixed 'journald.'.</description>
   <row>
     <panel>
