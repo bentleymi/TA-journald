@@ -3,5 +3,6 @@
     <view name="journald_overview" />
     <view name="journald_metrics" />
     <search label="TA-journald-logplane Events" search="search index=main sourcetype=journald:status" />
+    <view name="license" />
   </nav>
 </application>
